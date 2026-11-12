@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnatolianCore // Özelsürüm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #0b0b0b;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* SOL ÜST LOGO & ALT HİZALAMA */
+        .brand-container {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInDown 0.8s ease;
+        }
+        .brand-logo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+        .brand-logo span {
+            color: #C00000;
+            text-shadow: 0 0 12px rgba(192, 0, 0, 0.7);
+        }
+        .brand-sub {
+            font-size: 0.65rem;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: -1px;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: #141414;
+            border: 1px solid #222;
+            padding: 35px 25px;
+            border-radius: 10px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 25px rgba(192, 0, 0, 0.12);
+            text-align: center;
+            animation: scaleUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+        }
+
+        .screen {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        p, label {
+            font-size: 0.95rem;
+            color: #bbb;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            background: #C00000;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(192, 0, 0, 0.3);
+        }
+        button:hover {
+            background: #d60000;
+            box-shadow: 0 0 25px rgba(192, 0, 0, 0.7);
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button.secondary {
+            background: #1e1e1e;
+            color: #aaa;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.02);
+        }
+        button.secondary:hover {
+            background: #2a2a2a;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        input:focus {
+            border-color: #C00000;
+            box-shadow: 0 0 18px rgba(192, 0, 0, 0.4);
+        }
+        .error-msg {
+            color: #C00000;
+            font-size: 0.85rem;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            min-height: 20px;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .romantic-text {
+            text-align: left;
+            font-size: 0.95rem;
+            color: #ddd;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .instagram-box {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+        .instagram-handle {
+            font-weight: 500;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .copy-btn {
+            background: #C00000;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            flex: unset;
+            box-shadow: 0 0 10px rgba(192, 0, 0, 0.3);
+        }
+        .copy-btn:hover {
+            background: #d60000;
+            box-shadow: 0 0 20px rgba(192, 0, 0, 0.6);
+        }
+
+        /* TOAST BİLDİRİM STİLİ */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #181818;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid #C00000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(192,0,0,0.4);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            opacity: 0;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SOL ÜST LOGO & ALT HİZALAMA -->
+    <div class="brand-container">
+        <div class="brand-logo">Anatolian<span>Core</span></div>
+        <div class="brand-sub">özelsürüm</div>
+    </div>
+
+    <!-- TOAST BİLDİRİM ELEMENTİ -->
+    <div id="toast">Kullanıcı adı kopyalandı! @tasd.emir25</div>
+
+    <div class="container" id="app-container">
+        
+        <!-- EKRAN 0: İSİM DOĞRULAMA -->
+        <div id="screen-name" class="screen">
+            <h1>Erişim Doğrulama</h1>
+            <label>Devam etmeden önce adını öğrenebilir miyim?</label>
+            <input type="text" id="ans-name" placeholder="Adını yaz...">
+            <div id="error-msg-name" class="error-msg"></div>
+            <button onclick="checkName()">Sisteme Gir</button>
+        </div>
+
+        <!-- EKRAN 1: UYARI EKRANI -->
+        <div id="screen-warning" class="screen hidden">
+            <h1>Bildirim</h1>
+            <p>Takıntılı gibi göründüğümün farkındayım ama asla öyle bir niyetim yok; sadece farklı bir yoldan bir deneme, umarım anlarsın.<br><br>Belki göreceğin metinlerden ya da sorulardan hoşlanmayabilirsin, o yüzden seni bilgilendirmek istedim. Devam etmek istersen alttan devam tuşunu kullan.</p>
+            <div class="btn-group">
+                <button class="secondary" onclick="handleRefuse()">Hayır</button>
+                <button onclick="nextStep(1)">Devam</button>
+            </div>
+        </div>
+
+        <!-- EKRAN 2: HAYIR CEVABI -->
+        <div id="screen-refuse" class="screen hidden">
+            <p style="margin-top: 10px; color: #ccc; line-height: 1.6;">Herkesin kararına her zaman saygı duydum, sana da duyuyorum. Ama merak edersen diye sorular için sayfayı yenilemen yeterli. Güle güle.</p>
+        </div>
+
+        <!-- EKRAN 3: SORU 1 -->
+        <div id="screen-q1" class="screen hidden">
+            <h1>Soru 1 / 4</h1>
+            <label>Seninle ilk nerede tanıştık?</label>
+            <input type="text" id="ans-1" placeholder="Cevabını yaz...">
+            <div id="error-msg-1" class="error-msg"></div>
+            <button onclick="checkQ(1)">İlerle</button>
+        </div>
+
+        <!-- EKRAN 4: SORU 2 -->
+        <div id="screen-q2" class="screen hidden">
+            <h1>Soru 2 / 4</h1>
+            <label>Lisede sınıftaki en yakın arkadaşın (evi yakın olmasına rağmen geç kalmayı başarabilen biri)?</label>
+            <input type="text" id="ans-2" placeholder="Cevabını yaz...">
+            <div id="error-msg-2" class="error-msg"></div>
+            <button onclick="checkQ(2)">İlerle</button>
+        </div>
+
+        <!-- EKRAN 5: SORU 3 -->
+        <div id="screen-q3" class="screen hidden">
+            <h1>Soru 3 / 4</h1>
+            <label>Lisede hangi şubedeydin?</label>
+            <input type="text" id="ans-3" placeholder="Cevabını yaz...">
+            <div id="error-msg-3" class="error-msg"></div>
+            <button onclick="checkQ(3)">İlerle</button>
+        </div>
+
+        <!-- EKRAN 6: SORU 4 -->
+        <div id="screen-q4" class="screen hidden">
+            <h1>Soru 4 / 4</h1>
+            <label>Saçlarınla uyumlu hırkan vardı rengi neydi?</label>
+            <input type="text" id="ans-4" placeholder="Cevabını yaz...">
+            <div id="error-msg-4" class="error-msg"></div>
+            <button onclick="checkQ(4)">Sistemi Tamamla</button>
+        </div>
+
+        <!-- EKRAN 7: FİNAL / ROMANTİK MESAJ & İNTERAKTİF SEÇENEKLER -->
+        <div id="screen-final" class="screen hidden">
+            <div class="romantic-text">
+                <p>Uzun zamandır içimde taşıdığım, kelimelere dökmeye cesaret edemediğim bir şey var...</p>
+                <p style="margin-top: 12px;">Senden çok uzun zamandır hoşlanıyorum. O gün bugündür cesaretimi toplayıp bir türlü söyleyemedim, hep bir adım geride kaldım. Ama geçen bu uzun yıllar boyunca seni her yerde, sanki kalabalığın içinde hep seni arar gibi aradım durdum.</p>
+                <p style="margin-top: 12px; color: #C00000; font-weight: 500; text-shadow: 0 0 10px rgba(192,0,0,0.3);">İyi ki yollarımız kesişmiş, iyi ki varsın.</p>
+            </div>
+            
+            <div id="final-options">
+                <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 12px;">Buna küçük bir karşılık vermek ister misin?</p>
+                <div class="btn-group">
+                    <button class="secondary" onclick="handleNotYet()">Maalesef</button>
+                    <button onclick="handleChance()">Şans verebilirim</button>
+                </div>
+            </div>
+
+            <!-- MAALESEF CEVABI -->
+            <div id="response-notyet" class="screen hidden" style="margin-top: 15px;">
+                <p style="font-size: 0.9rem; color: #aaa; line-height: 1.5;">Dürüstlüğün ve bunu buraya kadar okuyup değer verdiğin için çok teşekkür ederim. Her düşüncene saygım sonsuz, kalbini yorduysam affola. Kendine çok iyi bak.</p>
+            </div>
+
+            <!-- ŞANS VEREBİLİRİM CEVABI -->
+            <div id="response-chance" class="screen hidden" style="margin-top: 15px;">
+                <p style="font-size: 0.9rem; color: #4CAF50; margin-bottom: 8px; text-shadow: 0 0 10px rgba(76,175,80,0.3);">Bunu duyduğuma gerçekten çok sevindim...</p>
+                <div class="instagram-box">
+                    <span class="instagram-handle">@tasd.emir25</span>
+                    <button class="copy-btn" onclick="copyInsta()">Kopyala</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function cleanText(text) {
+            return text
+                .trim()
+                .toLowerCase()
+                .replace(/İ/g, 'i')
+                .replace(/I/g, 'ı')
+                .replace(/ı/g, 'i')
+                .replace(/ş/g, 's')
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c')
+                .replace(/î/g, 'i');
+        }
+
+        function switchScreen(screenId) {
+            const screens = ['screen-name', 'screen-warning', 'screen-refuse', 'screen-q1', 'screen-q2', 'screen-q3', 'screen-q4', 'screen-final'];
+            screens.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            const target = document.getElementById(screenId);
+            target.classList.remove('hidden');
+            target.style.animation = 'none';
+            target.offsetHeight; 
+            target.style.animation = 'fadeIn 0.4s ease forwards';
+        }
+
+        function checkName() {
+            const val = cleanText(document.getElementById('ans-name').value);
+            const err = document.getElementById('error-msg-name');
+            if (val === 'zeynep' || val === 'sude' || val === 'zeynepsude' || val === 'zeynep sude') {
+                err.innerText = "";
+                switchScreen('screen-warning');
+            } else {
+                err.innerText = "Tanımlanamayan kullanıcı, erişim reddedildi.";
+            }
+        }
+
+        function handleRefuse() {
+            switchScreen('screen-refuse');
+        }
+
+        function nextStep(step) {
+            if (step === 1) switchScreen('screen-q1');
+        }
+
+        function checkQ(qNum) {
+            const inputVal = document.getElementById(`ans-${qNum}`).value;
+            const cleaned = cleanText(inputVal);
+            const errorDiv = document.getElementById(`error-msg-${qNum}`);
+            
+            let isCorrect = false;
+
+            if (qNum === 1) {
+                if (cleaned === 'okul') isCorrect = true;
+            } else if (qNum === 2) {
+                if (cleaned === 'busra' || cleaned === 'büşra') isCorrect = true;
+            } else if (qNum === 3) {
+                if (cleaned === 'a') isCorrect = true;
+            } else if (qNum === 4) {
+                if (cleaned === 'kirmizi' || cleaned === 'kırmızı') isCorrect = true;
+            }
+
+            if (isCorrect) {
+                errorDiv.innerText = "";
+                if (qNum === 1) switchScreen('screen-q2');
+                else if (qNum === 2) switchScreen('screen-q3');
+                else if (qNum === 3) switchScreen('screen-q4');
+                else if (qNum === 4) switchScreen('screen-final');
+            } else {
+                errorDiv.innerText = "Eksik veya hatalı bilgi, tekrar dene.";
+            }
+        }
+
+        function handleNotYet() {
+            document.getElementById('final-options').classList.add('hidden');
+            const target = document.getElementById('response-notyet');
+            target.classList.remove('hidden');
+            target.style.animation = 'fadeIn 0.4s ease forwards';
+        }
+
+        function handleChance() {
+            document.getElementById('final-options').classList.add('hidden');
+            const target = document.getElementById('response-chance');
+            target.classList.remove('hidden');
+            target.style.animation = 'fadeIn 0.4s ease forwards';
+        }
+
+        /* GÜÇLENDİRİLMİŞ KOPYALAMA VE TOAST FONKSİYONU */
+        function copyInsta() {
+            const textToCopy = "@tasd.emir25";
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    triggerToast();
+                }).catch(() => {
+                    fallbackCopyText(textToCopy);
+                });
+            } else {
+                fallbackCopyText(textToCopy);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Sayfanın kaymasını önlemek için
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                triggerToast();
+            } catch (err) {
+                console.error('Kopyalanamadı', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function triggerToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            
+            // Buton üzerindeki metni de geçici olarak değiştirelim
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Kopyalandı!";
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                btn.innerText = originalText;
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
