@@ -177,37 +177,60 @@
         }
         .instagram-box {
             background: #1a1a1a;
-            border: 1px solid #333;
-            padding: 15px;
-            border-radius: 6px;
+            border: 1px solid #C00000;
+            padding: 18px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-top: 15px;
-            animation: fadeIn 0.5s ease;
+            box-shadow: 0 0 20px rgba(192, 0, 0, 0.25);
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        @keyframes bounceIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .instagram-handle {
-            font-weight: 500;
+            font-weight: 600;
             color: #fff;
             letter-spacing: 0.5px;
+            font-size: 1.05rem;
         }
-        .copy-btn {
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .copy-btn, .visit-btn {
             background: #C00000;
             color: white;
             border: none;
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            flex: unset;
+            text-decoration: none;
+            display: inline-block;
             box-shadow: 0 0 10px rgba(192, 0, 0, 0.3);
+            transition: all 0.2s;
         }
-        .copy-btn:hover {
+        .copy-btn:hover, .visit-btn:hover {
             background: #d60000;
-            box-shadow: 0 0 20px rgba(192, 0, 0, 0.6);
+            box-shadow: 0 0 15px rgba(192, 0, 0, 0.6);
+        }
+        .visit-btn {
+            background: #222;
+            border: 1px solid #444;
+        }
+        .visit-btn:hover {
+            background: #333;
         }
 
-        /* TOAST BİLDİRİM STİLİ */
+        /* TOAST BİLDİRİMİ */
         #toast {
             position: fixed;
             bottom: 30px;
@@ -230,6 +253,14 @@
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+        
+        .success-feedback {
+            font-size: 0.8rem;
+            color: #4CAF50;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            animation: fadeIn 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -240,7 +271,7 @@
         <div class="brand-sub">özelsürüm</div>
     </div>
 
-    <!-- TOAST BİLDİRİM ELEMENTİ -->
+    <!-- TOAST BİLDİRİMİ -->
     <div id="toast">Kullanıcı adı kopyalandı! @tasd.emir25</div>
 
     <div class="container" id="app-container">
@@ -328,10 +359,14 @@
 
             <!-- ŞANS VEREBİLİRİM CEVABI -->
             <div id="response-chance" class="screen hidden" style="margin-top: 15px;">
-                <p style="font-size: 0.9rem; color: #4CAF50; margin-bottom: 8px; text-shadow: 0 0 10px rgba(76,175,80,0.3);">Bunu duyduğuma gerçekten çok sevindim...</p>
+                <div class="success-feedback">⚡ SİSTEM BAŞARIYLA ONAYLANDI ⚡</div>
+                <p style="font-size: 0.9rem; color: #4CAF50; margin-bottom: 12px; font-weight: 500; text-shadow: 0 0 10px rgba(76,175,80,0.3);">Bunu duyduğuma gerçekten çok sevindim. Frekanslar eşleşti...</p>
                 <div class="instagram-box">
                     <span class="instagram-handle">@tasd.emir25</span>
-                    <button class="copy-btn" onclick="copyInsta()">Kopyala</button>
+                    <div class="action-btns">
+                        <a href="https://instagram.com/tasd.emir25" target="_blank" class="visit-btn">Profili Aç</a>
+                        <button class="copy-btn" onclick="copyInsta()">Kopyala</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -427,7 +462,6 @@
             target.style.animation = 'fadeIn 0.4s ease forwards';
         }
 
-        /* GÜÇLENDİRİLMİŞ KOPYALAMA VE TOAST FONKSİYONU */
         function copyInsta() {
             const textToCopy = "@tasd.emir25";
             
@@ -445,7 +479,7 @@
         function fallbackCopyText(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
-            textArea.style.position = "fixed";  // Sayfanın kaymasını önlemek için
+            textArea.style.position = "fixed";
             textArea.style.top = "0";
             textArea.style.left = "0";
             textArea.style.opacity = "0";
@@ -465,7 +499,6 @@
             const toast = document.getElementById('toast');
             toast.classList.add('show');
             
-            // Buton üzerindeki metni de geçici olarak değiştirelim
             const btn = document.querySelector('.copy-btn');
             const originalText = btn.innerText;
             btn.innerText = "Kopyalandı!";
