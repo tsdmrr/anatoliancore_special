@@ -699,8 +699,9 @@
                 icon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
             }
             // YouTube player'ı mute et
-            if (currentIndex >= 0) {
-                playSong(currentIndex); // yeniden yükle mute parametresiyle
+            if (ytPlayer && ytPlayer.mute) {
+                if (isMuted) ytPlayer.mute();
+                else ytPlayer.unMute();
             }
         }
 
@@ -886,7 +887,7 @@
 
         document.getElementById('ans-name').focus();
 
-        // ===== PLAYLIST (YouTube only) =====
+        // ===== PLAYLIST (YouTube IFrame API) =====
         const playlist = [
             { title: "Selin - SEVEMEZSİN", id: "vt1OP42Em6o" },
             { title: "Semicenk - Sen Kaldın", id: "QPXU_mvj2dg" },
@@ -912,7 +913,29 @@
             { title: "Night Drive", id: "mPZkdNFkNps" }
         ];
 
+        let ytPlayer = null;
         let currentIndex = -1;
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('ytPlayer', {
+                height: '200',
+                width: '100%',
+                playerVars: {
+                    autoplay: 1,
+                    modestbranding: 1,
+                    rel: 0,
+                    playsinline: 1,
+                    iv_load_policy: 3
+                },
+                events: {
+                    onReady: () => {}
+                }
+            });
+        }
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
 
         function togglePlaylist() {
             document.getElementById('playlistOverlay').classList.toggle('show');
@@ -935,31 +958,25 @@
             currentIndex = index;
             const song = playlist[index];
             document.getElementById('currentSong').textContent = song.title;
-            const textEl = document.getElementById('musicBtnText');
-            textEl.textContent = song.title;
+            document.getElementById('musicBtnText').textContent = song.title;
 
-            const playerDiv = document.getElementById('ytPlayer');
-            playerDiv.innerHTML = '';
+            if (ytPlayer && ytPlayer.loadVideoById) {
+                ytPlayer.loadVideoById(song.id);
+                if (isMuted) ytPlayer.mute();
+                else ytPlayer.unMute();
+                ytPlayer.playVideo();
+            }
 
-            const iframe = document.createElement('iframe');
-            iframe.width = '100%';
-            iframe.height = '200';
-            // origin parametresi ekle (hata 153'ü çözer çoğu zaman)
-            const origin = encodeURIComponent(window.location.origin || 'https://localhost');
-            const muteParam = isMuted ? '&mute=1' : '&mute=0';
-            iframe.src = `https://www.youtube-nocookie.com/embed/${song.id}?autoplay=1${muteParam}&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${origin}&start=0`;
-            iframe.frameBorder = '0';
-            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-            iframe.allowFullscreen = true;
-            playerDiv.appendChild(iframe);
-
-            // Hata olursa diye yedek link
-            const fallback = document.createElement('a');
-            fallback.href = `https://www.youtube.com/watch?v=${song.id}`;
-            fallback.target = '_blank';
-            fallback.textContent = 'YouTube’da Aç';
-            fallback.style.cssText = 'display:block; margin-top:8px; color:#C00000; font-size:0.85rem; text-decoration:none;';
-            playerDiv.appendChild(fallback);
+            const playerBox = document.querySelector('.player-box');
+            let oldLink = playerBox.querySelector('.yt-open-link');
+            if (oldLink) oldLink.remove();
+            const openYt = document.createElement('a');
+            openYt.className = 'yt-open-link';
+            openYt.href = `https://www.youtube.com/watch?v=${song.id}`;
+            openYt.target = '_blank';
+            openYt.textContent = "YouTube'de Aç";
+            openYt.style.cssText = 'display:block; margin-top:8px; color:#C00000; font-size:0.85rem; text-decoration:none; text-align:center;';
+            playerBox.appendChild(openYt);
 
             renderPlaylist();
         }
