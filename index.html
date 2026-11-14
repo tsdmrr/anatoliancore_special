@@ -127,8 +127,10 @@
             position: absolute;
             top: 18px;
             right: 18px;
-            background: rgba(30,30,30,0.85);
-            border: 1px solid #333;
+            background: rgba(30, 30, 30, 0.45);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -138,10 +140,10 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
-            backdrop-filter: blur(8px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        .mute-btn:hover { background: #222; border-color: #555; }
-        .mute-btn.active { border-color: var(--red); }
+        .mute-btn:hover { background: rgba(40,40,40,0.55); border-color: rgba(255,255,255,0.2); }
+        .mute-btn.active { border-color: rgba(192, 0, 0, 0.5); }
         .mute-btn svg { width: 22px; height: 22px; fill: #aaa; transition: fill 0.3s; }
         .mute-btn.active svg { fill: var(--red); }
 
@@ -149,8 +151,10 @@
             position: absolute;
             top: 16px;
             right: 68px;
-            background: rgba(30,30,30,0.9);
-            border: 1px solid #333;
+            background: rgba(30, 30, 30, 0.45);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 0 12px;
             height: 42px;
             border-radius: 21px;
@@ -160,14 +164,14 @@
             align-items: center;
             gap: 6px;
             transition: all 0.3s;
-            backdrop-filter: blur(8px);
             font-size: 0.78rem;
-            color: #ccc;
+            color: #ddd;
             max-width: none;
             width: auto;
             white-space: nowrap;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        .music-btn:hover { background: #222; border-color: #555; color: #fff; }
+        .music-btn:hover { background: rgba(40,40,40,0.55); border-color: rgba(255,255,255,0.2); color: #fff; }
         .music-btn svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
         .music-btn span {
             white-space: nowrap;
@@ -210,14 +214,18 @@
         }
         .playlist-overlay.show { display: flex; }
         .playlist-modal {
-            background: #121212;
+            background: rgba(18, 18, 18, 0.65);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
             width: 100%;
             max-width: 420px;
             max-height: 85vh;
-            border-radius: 16px 16px 0 0;
+            border-radius: 20px 20px 0 0;
             padding: 16px;
             overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom: none;
         }
         .playlist-header {
             display: flex;
@@ -286,21 +294,22 @@
         .container {
             max-width: 460px;
             width: 100%;
-            background: var(--card);
-            backdrop-filter: blur(16px);
-            border: 1px solid #2a2a2a;
+            background: rgba(20, 20, 20, 0.45);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 32px 22px;
-            border-radius: 14px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(192,0,0,0.12);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             text-align: center;
             position: relative;
             z-index: 2;
-            transition: border-color 0.5s, box-shadow 0.5s;
+            transition: all 0.5s ease;
         }
 
         body.energy-boost .container {
-            border-color: rgba(192, 0, 0, 0.55);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 50px rgba(192, 0, 0, 0.35);
+            border-color: rgba(192, 0, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 40px rgba(192, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
         .progress-bar {
@@ -352,15 +361,16 @@
         button {
             flex: 1;
             padding: 13px 10px;
-            background: var(--red);
-            border: none;
-            border-radius: 8px;
+            background: rgba(192, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
             color: #fff;
             font-size: 0.94rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(192, 0, 0, 0.25);
+            box-shadow: 0 4px 20px rgba(192, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
         }
         button:hover {
             background: #e00000;
