@@ -2,250 +2,343 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AnatolianCore // Özelsürüm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
+        :root {
+            --red: #C00000;
+            --red-glow: rgba(192, 0, 0, 0.45);
+            --bg: #0a0a0a;
+            --card: rgba(18, 18, 18, 0.92);
+            --text: #f0f0f0;
+            --muted: #999;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
+
         body {
-            background-color: #0b0b0b;
-            color: #e0e0e0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
+            overflow: hidden;
             position: relative;
-            overflow-x: hidden;
         }
 
-        /* SOL ÜST LOGO & ALT HİZALAMA */
+        .ambient-bg {
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(192, 0, 0, 0.28) 0%, transparent 68%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(80px);
+            animation: pulseGlow 5s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+            transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        body.energy-boost .ambient-bg {
+            background: radial-gradient(circle, rgba(255, 30, 30, 0.65) 0%, rgba(192, 0, 0, 0.2) 70%);
+            transform: translate(-50%, -50%) scale(1.9);
+            filter: blur(50px);
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.25); opacity: 0.8; }
+        }
+
+        .spark {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ff3333;
+            border-radius: 50%;
+            box-shadow: 0 0 14px #ff1a1a;
+            pointer-events: none;
+            z-index: 5;
+            animation: floatSpark 1.5s ease-out forwards;
+        }
+
+        @keyframes floatSpark {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-180px) scale(0.15); }
+        }
+
+        .success-float {
+            position: absolute;
+            font-weight: 600;
+            color: #4CAF50;
+            font-size: 1.1rem;
+            pointer-events: none;
+            z-index: 20;
+            animation: successPop 1.4s ease-out forwards;
+            text-shadow: 0 0 12px rgba(76,175,80,0.6);
+            white-space: nowrap;
+        }
+
+        @keyframes successPop {
+            0% { opacity: 0; transform: translateY(10px) scale(0.6); }
+            30% { opacity: 1; transform: translateY(-20px) scale(1.15); }
+            100% { opacity: 0; transform: translateY(-70px) scale(0.9); }
+        }
+
         .brand-container {
             position: absolute;
-            top: 25px;
-            left: 25px;
-            display: flex;
-            flex-direction: column;
-            animation: fadeInDown 0.8s ease;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            animation: fadeInDown 0.7s ease;
         }
         .brand-logo {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #ffffff;
+            letter-spacing: 0.4px;
         }
         .brand-logo span {
-            color: #C00000;
-            text-shadow: 0 0 12px rgba(192, 0, 0, 0.7);
+            color: var(--red);
+            text-shadow: 0 0 12px var(--red-glow);
         }
         .brand-sub {
-            font-size: 0.65rem;
-            color: #666;
-            letter-spacing: 2px;
+            font-size: 0.62rem;
+            color: #555;
+            letter-spacing: 1.8px;
             text-transform: uppercase;
-            margin-top: -1px;
+            margin-top: 1px;
         }
+
+        .mute-btn {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(30,30,30,0.85);
+            border: 1px solid #333;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+        }
+        .mute-btn:hover { background: #222; border-color: #555; }
+        .mute-btn.active { border-color: var(--red); }
+        .mute-btn svg { width: 22px; height: 22px; fill: #aaa; transition: fill 0.3s; }
+        .mute-btn.active svg { fill: var(--red); }
+
+        .score-display {
+            position: absolute;
+            top: 22px;
+            right: 78px;
+            font-size: 0.85rem;
+            color: #666;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .score-display.show { opacity: 1; color: #aaa; }
 
         .container {
-            max-width: 480px;
+            max-width: 460px;
             width: 100%;
-            background: #141414;
-            border: 1px solid #222;
-            padding: 35px 25px;
-            border-radius: 10px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 25px rgba(192, 0, 0, 0.12);
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            border: 1px solid #2a2a2a;
+            padding: 32px 22px;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(192,0,0,0.12);
             text-align: center;
-            animation: scaleUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             position: relative;
+            z-index: 2;
+            transition: border-color 0.5s, box-shadow 0.5s;
         }
 
-        .screen {
-            animation: fadeIn 0.4s ease forwards;
+        body.energy-boost .container {
+            border-color: rgba(192, 0, 0, 0.55);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 50px rgba(192, 0, 0, 0.35);
         }
 
+        .progress-bar {
+            height: 3px;
+            background: #222;
+            border-radius: 2px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar.show { display: block; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a00000, var(--red));
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--red);
+        }
+
+        .screen { animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        @keyframes scaleUp {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-10px); }
+            from { opacity: 0; transform: translateY(-8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-            color: #ffffff;
+            font-size: 1.28rem;
+            margin-bottom: 10px;
             font-weight: 500;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
         p, label {
-            font-size: 0.95rem;
-            color: #bbb;
-            line-height: 1.5;
-            margin-bottom: 20px;
+            font-size: 0.96rem;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-bottom: 18px;
             display: block;
         }
+
         .btn-group {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 12px;
         }
         button {
             flex: 1;
-            padding: 12px;
-            background: #C00000;
+            padding: 13px 10px;
+            background: var(--red);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             color: #fff;
-            font-size: 0.95rem;
+            font-size: 0.94rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 15px rgba(192, 0, 0, 0.3);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(192, 0, 0, 0.25);
         }
         button:hover {
-            background: #d60000;
-            box-shadow: 0 0 25px rgba(192, 0, 0, 0.7);
+            background: #e00000;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(192, 0, 0, 0.45);
         }
-        button:active {
-            transform: translateY(0);
-        }
+        button:active { transform: translateY(0); }
         button.secondary {
-            background: #1e1e1e;
-            color: #aaa;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.02);
+            background: #1c1c1c;
+            color: #bbb;
+            box-shadow: none;
         }
         button.secondary:hover {
             background: #2a2a2a;
             color: #fff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
         }
+
         input {
             width: 100%;
-            padding: 12px;
-            background: #1a1a1a;
+            padding: 13px;
+            background: #141414;
             border: 1px solid #333;
-            border-radius: 6px;
+            border-radius: 8px;
             color: #fff;
-            font-size: 0.95rem;
+            font-size: 0.96rem;
             outline: none;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
+            margin-bottom: 12px;
             text-align: center;
+            transition: all 0.3s;
         }
         input:focus {
-            border-color: #C00000;
-            box-shadow: 0 0 18px rgba(192, 0, 0, 0.4);
+            border-color: var(--red);
+            box-shadow: 0 0 20px rgba(192, 0, 0, 0.35);
         }
         .error-msg {
-            color: #C00000;
-            font-size: 0.85rem;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            min-height: 20px;
-            animation: shake 0.3s ease;
+            color: var(--red);
+            font-size: 0.82rem;
+            min-height: 18px;
+            margin-bottom: 8px;
+            animation: shake 0.35s ease;
         }
-
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
+
         .romantic-text {
             text-align: left;
-            font-size: 0.95rem;
+            font-size: 0.97rem;
             color: #ddd;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            line-height: 1.65;
+            margin-bottom: 18px;
         }
+        .romantic-text p { margin-bottom: 12px; color: #ddd; }
+
         .instagram-box {
-            background: #1a1a1a;
-            border: 1px solid #C00000;
-            padding: 18px;
-            border-radius: 8px;
+            background: #161616;
+            border: 1px solid var(--red);
+            padding: 16px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 15px;
-            box-shadow: 0 0 20px rgba(192, 0, 0, 0.25);
-            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 12px;
+            box-shadow: 0 0 30px rgba(192, 0, 0, 0.25);
         }
-
-        @keyframes bounceIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
         .instagram-handle {
             font-weight: 600;
-            color: #fff;
-            letter-spacing: 0.5px;
             font-size: 1.05rem;
+            letter-spacing: 0.3px;
         }
-        
-        .action-btns {
-            display: flex;
-            gap: 8px;
-        }
-
+        .action-btns { display: flex; gap: 8px; }
         .copy-btn, .visit-btn {
-            background: #C00000;
+            background: var(--red);
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 8px 14px;
+            border-radius: 6px;
             font-size: 0.8rem;
             cursor: pointer;
             text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 0 10px rgba(192, 0, 0, 0.3);
             transition: all 0.2s;
         }
-        .copy-btn:hover, .visit-btn:hover {
-            background: #d60000;
-            box-shadow: 0 0 15px rgba(192, 0, 0, 0.6);
-        }
-        .visit-btn {
-            background: #222;
-            border: 1px solid #444;
-        }
-        .visit-btn:hover {
-            background: #333;
-        }
+        .visit-btn { background: #222; border: 1px solid #444; }
+        .visit-btn:hover { background: #333; }
+        .copy-btn:hover { background: #e00000; }
 
-        /* TOAST BİLDİRİMİ */
         #toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 28px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #181818;
+            transform: translateX(-50%) translateY(80px);
+            background: #1a1a1a;
             color: #fff;
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: 1px solid #C00000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(192,0,0,0.4);
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            padding: 12px 22px;
+            border-radius: 10px;
+            border: 1px solid var(--red);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            font-size: 0.88rem;
             opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 1000;
             pointer-events: none;
         }
@@ -253,95 +346,124 @@
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-        
-        .success-feedback {
-            font-size: 0.8rem;
-            color: #4CAF50;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-            animation: fadeIn 0.3s ease;
+
+        @media (max-width: 480px) {
+            .container { padding: 26px 16px; }
+            h1 { font-size: 1.18rem; }
+            .score-display { right: 70px; font-size: 0.78rem; }
         }
     </style>
 </head>
 <body>
+    <div class="ambient-bg"></div>
 
-    <!-- SOL ÜST LOGO & ALT HİZALAMA -->
     <div class="brand-container">
         <div class="brand-logo">Anatolian<span>Core</span></div>
         <div class="brand-sub">özelsürüm</div>
     </div>
 
-    <!-- TOAST BİLDİRİMİ -->
-    <div id="toast">Kullanıcı adı kopyalandı! @tasd.emir25</div>
+    <div class="score-display" id="scoreDisplay">Skor: 0/7</div>
 
-    <div class="container" id="app-container">
-        
-        <!-- EKRAN 0: İSİM DOĞRULAMA -->
+    <button class="mute-btn" id="muteBtn" onclick="toggleMute()">
+        <svg id="muteIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+    </button>
+
+    <div id="toast">Kopyalandı! @tasd.emir25</div>
+
+    <div class="container">
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- EKRAN 0: İSİM -->
         <div id="screen-name" class="screen">
             <h1>Erişim Doğrulama</h1>
             <label>Devam etmeden önce adını öğrenebilir miyim?</label>
-            <input type="text" id="ans-name" placeholder="Adını yaz...">
+            <input type="text" id="ans-name" placeholder="Adını yaz..." autocomplete="off">
             <div id="error-msg-name" class="error-msg"></div>
             <button onclick="checkName()">Sisteme Gir</button>
         </div>
 
-        <!-- EKRAN 1: UYARI EKRANI -->
+        <!-- EKRAN 1: UYARI -->
         <div id="screen-warning" class="screen hidden">
             <h1>Bildirim</h1>
-            <p>Takıntılı gibi göründüğümün farkındayım ama asla öyle bir niyetim yok; sadece farklı bir yoldan bir deneme, umarım anlarsın.<br><br>Belki göreceğin metinlerden ya da sorulardan hoşlanmayabilirsin, o yüzden seni bilgilendirmek istedim. Devam etmek istersen alttan devam tuşunu kullan.</p>
+            <p>Takıntılı gibi göründüğümün farkındayım ama asla öyle bir niyetim yok; sadece farklı bir yoldan deneme. Belki bazı sorular garip gelebilir, o yüzden haber vermek istedim. Devam etmek istersen alttan ilerle.</p>
             <div class="btn-group">
                 <button class="secondary" onclick="handleRefuse()">Hayır</button>
-                <button onclick="nextStep(1)">Devam</button>
+                <button onclick="nextStep()">Devam</button>
             </div>
         </div>
 
-        <!-- EKRAN 2: HAYIR CEVABI -->
+        <!-- EKRAN 2: HAYIR -->
         <div id="screen-refuse" class="screen hidden">
-            <p style="margin-top: 10px; color: #ccc; line-height: 1.6;">Herkesin kararına her zaman saygı duydum, sana da duyuyorum. Ama merak edersen diye sorular için sayfayı yenilemen yeterli. Güle güle.</p>
+            <p style="margin-top: 10px; color: #ccc; line-height: 1.6;">Herkesin kararına saygı duydum, sana da duyuyorum. Merak edersen sayfayı yenilemen yeterli. Güle güle.</p>
         </div>
 
-        <!-- EKRAN 3: SORU 1 -->
+        <!-- SORULAR -->
         <div id="screen-q1" class="screen hidden">
-            <h1>Soru 1 / 4</h1>
+            <h1>Soru 1 / 7</h1>
             <label>Seninle ilk nerede tanıştık?</label>
-            <input type="text" id="ans-1" placeholder="Cevabını yaz...">
+            <input type="text" id="ans-1" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-1" class="error-msg"></div>
             <button onclick="checkQ(1)">İlerle</button>
         </div>
 
-        <!-- EKRAN 4: SORU 2 -->
         <div id="screen-q2" class="screen hidden">
-            <h1>Soru 2 / 4</h1>
-            <label>Lisede sınıftaki en yakın arkadaşın (evi yakın olmasına rağmen geç kalmayı başarabilen biri)?</label>
-            <input type="text" id="ans-2" placeholder="Cevabını yaz...">
+            <h1>Soru 2 / 7</h1>
+            <label>Lisede en yakın arkadaşın kimdi?</label>
+            <input type="text" id="ans-2" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-2" class="error-msg"></div>
             <button onclick="checkQ(2)">İlerle</button>
         </div>
 
-        <!-- EKRAN 5: SORU 3 -->
         <div id="screen-q3" class="screen hidden">
-            <h1>Soru 3 / 4</h1>
+            <h1>Soru 3 / 7</h1>
             <label>Lisede hangi şubedeydin?</label>
-            <input type="text" id="ans-3" placeholder="Cevabını yaz...">
+            <input type="text" id="ans-3" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-3" class="error-msg"></div>
             <button onclick="checkQ(3)">İlerle</button>
         </div>
 
-        <!-- EKRAN 6: SORU 4 -->
         <div id="screen-q4" class="screen hidden">
-            <h1>Soru 4 / 4</h1>
-            <label>Saçlarınla uyumlu hırkan vardı rengi neydi?</label>
-            <input type="text" id="ans-4" placeholder="Cevabını yaz...">
+            <h1>Soru 4 / 7</h1>
+            <label>Hırkanın rengi neydi?</label>
+            <input type="text" id="ans-4" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-4" class="error-msg"></div>
-            <button onclick="checkQ(4)">Sistemi Tamamla</button>
+            <button onclick="checkQ(4)">İlerle</button>
         </div>
 
-        <!-- EKRAN 7: FİNAL / ROMANTİK MESAJ & İNTERAKTİF SEÇENEKLER -->
+        <div id="screen-q5" class="screen hidden">
+            <h1>Soru 5 / 7</h1>
+            <label>Saçlarının rengi neydi?</label>
+            <input type="text" id="ans-5" placeholder="Cevabını yaz..." autocomplete="off">
+            <div id="error-msg-5" class="error-msg"></div>
+            <button onclick="checkQ(5)">İlerle</button>
+        </div>
+
+        <div id="screen-q6" class="screen hidden">
+            <h1>Soru 6 / 7</h1>
+            <label>Lisede en sevdiğin ders hangisiydi?</label>
+            <input type="text" id="ans-6" placeholder="Cevabını yaz..." autocomplete="off">
+            <div id="error-msg-6" class="error-msg"></div>
+            <button onclick="checkQ(6)">İlerle</button>
+        </div>
+
+        <div id="screen-q7" class="screen hidden">
+            <h1>Soru 7 / 7</h1>
+            <label>Okula genellikle nasıl gidiyordun?</label>
+            <input type="text" id="ans-7" placeholder="Cevabını yaz..." autocomplete="off">
+            <div id="error-msg-7" class="error-msg"></div>
+            <button onclick="checkQ(7)">Sistemi Tamamla</button>
+        </div>
+
+        <!-- FİNAL -->
         <div id="screen-final" class="screen hidden">
             <div class="romantic-text">
                 <p>Uzun zamandır içimde taşıdığım, kelimelere dökmeye cesaret edemediğim bir şey var...</p>
-                <p style="margin-top: 12px;">Senden çok uzun zamandır hoşlanıyorum. O gün bugündür cesaretimi toplayıp bir türlü söyleyemedim, hep bir adım geride kaldım. Ama geçen bu uzun yıllar boyunca seni her yerde, sanki kalabalığın içinde hep seni arar gibi aradım durdum.</p>
-                <p style="margin-top: 12px; color: #C00000; font-weight: 500; text-shadow: 0 0 10px rgba(192,0,0,0.3);">İyi ki yollarımız kesişmiş, iyi ki varsın.</p>
+                <p>Senden çok uzun zamandır hoşlanıyorum. O gün bugündür cesaretimi toplayıp bir türlü söyleyemedim, hep bir adım geride kaldım. Ama geçen bu uzun yıllar boyunca seni her yerde, sanki kalabalığın içinde hep seni arar gibi aradım durdum.</p>
+                <p style="color: #C00000; font-weight: 500; text-shadow: 0 0 8px rgba(192,0,0,0.25);">İyi ki yollarımız kesişmiş, iyi ki varsın.</p>
             </div>
             
             <div id="final-options">
@@ -352,15 +474,12 @@
                 </div>
             </div>
 
-            <!-- MAALESEF CEVABI -->
             <div id="response-notyet" class="screen hidden" style="margin-top: 15px;">
-                <p style="font-size: 0.9rem; color: #aaa; line-height: 1.5;">Dürüstlüğün ve bunu buraya kadar okuyup değer verdiğin için çok teşekkür ederim. Her düşüncene saygım sonsuz, kalbini yorduysam affola. Kendine çok iyi bak.</p>
+                <p style="font-size: 0.9rem; color: #aaa; line-height: 1.55;">Dürüstlüğün ve buraya kadar okuyup değer verdiğin için teşekkür ederim. Her düşüncene saygım sonsuz. Kendine çok iyi bak.</p>
             </div>
 
-            <!-- ŞANS VEREBİLİRİM CEVABI -->
             <div id="response-chance" class="screen hidden" style="margin-top: 15px;">
-                <div class="success-feedback">⚡ SİSTEM BAŞARIYLA ONAYLANDI ⚡</div>
-                <p style="font-size: 0.9rem; color: #4CAF50; margin-bottom: 12px; font-weight: 500; text-shadow: 0 0 10px rgba(76,175,80,0.3);">Bunu duyduğuma gerçekten çok sevindim. Frekanslar eşleşti...</p>
+                <p style="font-size: 0.9rem; color: #4CAF50; margin-bottom: 12px; font-weight: 500;">Bunu duyduğuma o kadar sevindim ki...</p>
                 <div class="instagram-box">
                     <span class="instagram-handle">@tasd.emir25</span>
                     <div class="action-btns">
@@ -370,81 +489,287 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
-        function cleanText(text) {
-            return text
-                .trim()
-                .toLowerCase()
-                .replace(/İ/g, 'i')
-                .replace(/I/g, 'ı')
-                .replace(/ı/g, 'i')
-                .replace(/ş/g, 's')
-                .replace(/ğ/g, 'g')
-                .replace(/ü/g, 'u')
-                .replace(/ö/g, 'o')
-                .replace(/ç/g, 'c')
-                .replace(/î/g, 'i');
+        let audioCtx = null;
+        let masterGain = null;
+        let isMuted = false;
+        let isPlayingAudio = false;
+        let score = 0;
+        const TOTAL_QUESTIONS = 7;
+
+        const screens = ['screen-name','screen-warning','screen-refuse','screen-q1','screen-q2','screen-q3','screen-q4','screen-q5','screen-q6','screen-q7','screen-final'];
+
+        function initAudio() {
+            if (isPlayingAudio || isMuted) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                masterGain = audioCtx.createGain();
+                masterGain.gain.value = 0.22;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 480;
+
+                const delay = audioCtx.createDelay();
+                delay.delayTime.value = 0.55;
+                const feedback = audioCtx.createGain();
+                feedback.gain.value = 0.45;
+
+                delay.connect(feedback);
+                feedback.connect(delay);
+                delay.connect(filter);
+                filter.connect(masterGain);
+                masterGain.connect(audioCtx.destination);
+
+                isPlayingAudio = true;
+                startAmbientMusic(filter);
+            } catch (e) { console.log("Ses başlatılamadı"); }
         }
 
-        function switchScreen(screenId) {
-            const screens = ['screen-name', 'screen-warning', 'screen-refuse', 'screen-q1', 'screen-q2', 'screen-q3', 'screen-q4', 'screen-final'];
-            screens.forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+        function playSoftNote(freq, duration, volume, dest) {
+            if (!audioCtx || isMuted) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(volume, now + 1.1);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+            osc.connect(gain);
+            gain.connect(dest);
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+
+        function startAmbientMusic(filterNode) {
+            const progressions = [
+                { bass: 110, notes: [220, 261.63, 329.63, 392] },
+                { bass: 87.31, notes: [174.61, 220, 261.63, 329.63] },
+                { bass: 130.81, notes: [261.63, 329.63, 392, 493.88] },
+                { bass: 98, notes: [196, 246.94, 293.66, 329.63] }
+            ];
+            let chordIdx = 0;
+            let noteIdx = 0;
+
+            function triggerChord() {
+                if (!audioCtx || isMuted) return;
+                const c = progressions[chordIdx];
+                playSoftNote(c.bass, 6, 0.1, filterNode);
+                playSoftNote(c.notes[0], 5.5, 0.06, filterNode);
+                playSoftNote(c.notes[1], 5.5, 0.05, filterNode);
+                chordIdx = (chordIdx + 1) % progressions.length;
+            }
+            triggerChord();
+            setInterval(triggerChord, 5400);
+
+            setInterval(() => {
+                if (!audioCtx || isMuted) return;
+                const active = progressions[(chordIdx + progressions.length - 1) % progressions.length];
+                playSoftNote(active.notes[noteIdx % active.notes.length], 3.2, 0.045, filterNode);
+                noteIdx++;
+            }, 1100);
+        }
+
+        function playSuccessSound() {
+            if (!audioCtx || isMuted) return;
+            try {
+                const now = audioCtx.currentTime;
+                // Bright ascending chime
+                [523.25, 659.25, 783.99].forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + i * 0.06);
+                    osc.stop(now + 0.4);
+                });
+            } catch(e) {}
+        }
+
+        function playConfettiSound() {
+            if (!audioCtx || isMuted) return;
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(60, now + 0.35);
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1200, now);
+                filter.frequency.exponentialRampToValueAtTime(200, now + 0.35);
+
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.45);
+
+                // Extra pop
+                const noise = audioCtx.createBufferSource();
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2);
+                noise.buffer = buffer;
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.18, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                noise.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                noise.start(now);
+            } catch(e) {}
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('muteBtn');
+            const icon = document.getElementById('muteIcon');
+            btn.classList.toggle('active', isMuted);
+            if (isMuted) {
+                icon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+            } else {
+                icon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+            }
+            if (masterGain) masterGain.gain.value = isMuted ? 0 : 0.22;
+        }
+
+        function cleanText(text) {
+            return text.trim().toLowerCase()
+                .replace(/İ/g, 'i').replace(/I/g, 'ı')
+                .replace(/ı/g, 'i').replace(/ş/g, 's')
+                .replace(/ğ/g, 'g').replace(/ü/g, 'u')
+                .replace(/ö/g, 'o').replace(/ç/g, 'c')
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function switchScreen(id) {
+            screens.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.classList.add('hidden');
             });
-            const target = document.getElementById(screenId);
+            const target = document.getElementById(id);
             target.classList.remove('hidden');
             target.style.animation = 'none';
-            target.offsetHeight; 
-            target.style.animation = 'fadeIn 0.4s ease forwards';
+            target.offsetHeight;
+            target.style.animation = 'fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+
+            const input = target.querySelector('input');
+            if (input) setTimeout(() => input.focus(), 100);
+
+            const progressBar = document.getElementById('progressBar');
+            const fill = document.getElementById('progressFill');
+            const scoreEl = document.getElementById('scoreDisplay');
+
+            if (id.startsWith('screen-q')) {
+                progressBar.classList.add('show');
+                scoreEl.classList.add('show');
+                const num = parseInt(id.replace('screen-q', ''));
+                fill.style.width = ((num / TOTAL_QUESTIONS) * 100) + '%';
+            } else if (id === 'screen-final') {
+                fill.style.width = '100%';
+                scoreEl.classList.add('show');
+            } else {
+                progressBar.classList.remove('show');
+                scoreEl.classList.remove('show');
+            }
+        }
+
+        function showSuccessEffect() {
+            score++;
+            document.getElementById('scoreDisplay').textContent = `Skor: ${score}/${TOTAL_QUESTIONS}`;
+            playSuccessSound();
+
+            const float = document.createElement('div');
+            float.className = 'success-float';
+            float.textContent = 'Doğru! +1';
+            float.style.left = '50%';
+            float.style.top = '45%';
+            float.style.transform = 'translateX(-50%)';
+            document.body.appendChild(float);
+            setTimeout(() => float.remove(), 1500);
+
+            triggerGlowEffect();
+        }
+
+        function triggerGlowEffect() {
+            document.body.classList.add('energy-boost');
+            for (let i = 0; i < 18; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'spark';
+                spark.style.left = (10 + Math.random() * 80) + 'vw';
+                spark.style.top = (30 + Math.random() * 50) + 'vh';
+                spark.style.animationDuration = (1.1 + Math.random() * 0.7) + 's';
+                document.body.appendChild(spark);
+                setTimeout(() => spark.remove(), 1600);
+            }
+            setTimeout(() => document.body.classList.remove('energy-boost'), 800);
         }
 
         function checkName() {
+            initAudio();
             const val = cleanText(document.getElementById('ans-name').value);
             const err = document.getElementById('error-msg-name');
-            if (val === 'zeynep' || val === 'sude' || val === 'zeynepsude' || val === 'zeynep sude') {
+            const accepted = ['zeynep', 'sude', 'zeynepsude', 'zeynepsude'];
+            if (accepted.includes(val) || val.includes('zeynep') || val.includes('sude')) {
                 err.innerText = "";
+                triggerGlowEffect();
                 switchScreen('screen-warning');
             } else {
                 err.innerText = "Tanımlanamayan kullanıcı, erişim reddedildi.";
             }
         }
 
-        function handleRefuse() {
-            switchScreen('screen-refuse');
+        function handleRefuse() { switchScreen('screen-refuse'); }
+
+        function nextStep() {
+            triggerGlowEffect();
+            switchScreen('screen-q1');
         }
 
-        function nextStep(step) {
-            if (step === 1) switchScreen('screen-q1');
-        }
+        const answers = {
+            1: ['okul'],
+            2: ['busra'],
+            3: ['a'],
+            4: ['kirmizi'],
+            5: ['siyah', 'kahverengi', 'sari', 'sarisin', 'kumral', 'kizil', 'kirmizi', 'beyaz', 'gri', 'platin', 'mor', 'mavi', 'yesil', 'pembe', 'turuncu', 'altin', 'bakir'],
+            6: ['matematik', 'edebiyat', 'ingilizce', 'tarih', 'cografya', 'fizik', 'kimya', 'biyoloji', 'felsefe', 'din', 'muzik', 'resim', 'beden', 'bilisim', 'almanca', 'fransizca', 'turkce', 'geometri', 'sosyal'],
+            7: ['yuruyerek', 'otobus', 'servis', 'yürüyerek', 'araba', 'arabayla', 'taksi', 'dolmus', 'bisiklet']
+        };
 
         function checkQ(qNum) {
-            const inputVal = document.getElementById(`ans-${qNum}`).value;
-            const cleaned = cleanText(inputVal);
+            const input = document.getElementById(`ans-${qNum}`);
+            const cleaned = cleanText(input.value);
             const errorDiv = document.getElementById(`error-msg-${qNum}`);
-            
-            let isCorrect = false;
 
-            if (qNum === 1) {
-                if (cleaned === 'okul') isCorrect = true;
-            } else if (qNum === 2) {
-                if (cleaned === 'busra' || cleaned === 'büşra') isCorrect = true;
-            } else if (qNum === 3) {
-                if (cleaned === 'a') isCorrect = true;
-            } else if (qNum === 4) {
-                if (cleaned === 'kirmizi' || cleaned === 'kırmızı') isCorrect = true;
-            }
+            const isCorrect = answers[qNum].some(a => cleaned === cleanText(a) || cleaned.includes(cleanText(a)));
 
             if (isCorrect) {
                 errorDiv.innerText = "";
-                if (qNum === 1) switchScreen('screen-q2');
-                else if (qNum === 2) switchScreen('screen-q3');
-                else if (qNum === 3) switchScreen('screen-q4');
-                else if (qNum === 4) switchScreen('screen-final');
+                showSuccessEffect();
+                setTimeout(() => {
+                    if (qNum < TOTAL_QUESTIONS) switchScreen(`screen-q${qNum + 1}`);
+                    else switchScreen('screen-final');
+                }, 600);
             } else {
                 errorDiv.innerText = "Eksik veya hatalı bilgi, tekrar dene.";
+                input.focus();
             }
         }
 
@@ -452,62 +777,61 @@
             document.getElementById('final-options').classList.add('hidden');
             const target = document.getElementById('response-notyet');
             target.classList.remove('hidden');
-            target.style.animation = 'fadeIn 0.4s ease forwards';
+            target.style.animation = 'fadeIn 0.45s ease forwards';
         }
 
         function handleChance() {
             document.getElementById('final-options').classList.add('hidden');
             const target = document.getElementById('response-chance');
             target.classList.remove('hidden');
-            target.style.animation = 'fadeIn 0.4s ease forwards';
+            target.style.animation = 'fadeIn 0.45s ease forwards';
+            triggerGlowEffect();
+            playConfettiSound();
+
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.55 },
+                colors: ['#C00000', '#ffffff', '#ff4d4d', '#ff9999', '#ff1a1a'],
+                scalar: 1.15
+            });
         }
 
         function copyInsta() {
-            const textToCopy = "@tasd.emir25";
-            
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    triggerToast();
-                }).catch(() => {
-                    fallbackCopyText(textToCopy);
-                });
-            } else {
-                fallbackCopyText(textToCopy);
-            }
+            const text = "@tasd.emir25";
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(triggerToast).catch(() => fallbackCopy(text));
+            } else fallbackCopy(text);
         }
 
-        function fallbackCopyText(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.top = "0";
-            textArea.style.left = "0";
-            textArea.style.opacity = "0";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                triggerToast();
-            } catch (err) {
-                console.error('Kopyalanamadı', err);
-            }
-            document.body.removeChild(textArea);
+        function fallbackCopy(text) {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            triggerToast();
         }
 
         function triggerToast() {
             const toast = document.getElementById('toast');
             toast.classList.add('show');
-            
-            const btn = document.querySelector('.copy-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "Kopyalandı!";
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                btn.innerText = originalText;
-            }, 2500);
+            setTimeout(() => toast.classList.remove('show'), 2200);
         }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const visible = document.querySelector('.screen:not(.hidden)');
+                if (!visible) return;
+                const btn = visible.querySelector('button:not(.secondary)');
+                if (btn) btn.click();
+            }
+        });
+
+        document.getElementById('ans-name').focus();
     </script>
 </body>
 </html>
