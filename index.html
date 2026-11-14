@@ -145,6 +145,102 @@
         .mute-btn svg { width: 22px; height: 22px; fill: #aaa; transition: fill 0.3s; }
         .mute-btn.active svg { fill: var(--red); }
 
+        .music-btn {
+            position: absolute;
+            top: 18px;
+            right: 70px;
+            background: rgba(30,30,30,0.85);
+            border: 1px solid #333;
+            padding: 0 12px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+            font-size: 0.8rem;
+            color: #aaa;
+            max-width: 160px;
+        }
+        .music-btn:hover { background: #222; border-color: #555; color: #fff; }
+        .music-btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+        .music-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .playlist-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .playlist-overlay.show { display: flex; }
+        .playlist-modal {
+            background: #121212;
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            border-radius: 16px 16px 0 0;
+            padding: 16px;
+            overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+        }
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .playlist-header h3 { font-size: 1.1rem; font-weight: 500; }
+        .close-playlist {
+            background: #222;
+            border: none;
+            color: #aaa;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .player-box {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .player-box iframe {
+            width: 100%;
+            height: 180px;
+            border: none;
+            border-radius: 8px;
+        }
+        .current-song {
+            font-size: 0.9rem;
+            color: #ddd;
+            margin-top: 8px;
+            min-height: 20px;
+        }
+        .playlist-item {
+            padding: 12px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: #ccc;
+            transition: background 0.2s;
+            border-bottom: 1px solid #222;
+        }
+        .playlist-item:hover, .playlist-item.active { background: rgba(192,0,0,0.15); color: #fff; }
+
+        @media (max-width: 480px) {
+            .music-btn { right: 60px; max-width: 120px; font-size: 0.75rem; padding: 0 8px; }
+            .mute-btn { right: 10px; }
+        }
+
         .score-display {
             position: absolute;
             top: 22px;
@@ -362,13 +458,32 @@
         <div class="brand-sub">özelsürüm</div>
     </div>
 
-    <div class="score-display" id="scoreDisplay">Skor: 0/7</div>
+    <div class="score-display" id="scoreDisplay">Skor: 0/6</div>
 
     <button class="mute-btn" id="muteBtn" onclick="toggleMute()">
         <svg id="muteIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
         </svg>
     </button>
+
+    <button class="music-btn" id="musicBtn" onclick="togglePlaylist()">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        <span id="musicBtnText">Müzik</span>
+    </button>
+
+    <div class="playlist-overlay" id="playlistOverlay" onclick="if(event.target===this) togglePlaylist()">
+        <div class="playlist-modal">
+            <div class="playlist-header">
+                <h3>Playlist</h3>
+                <button class="close-playlist" onclick="togglePlaylist()">×</button>
+            </div>
+            <div class="player-box">
+                <div id="ytPlayer"></div>
+                <div class="current-song" id="currentSong">Bir şarkı seç</div>
+            </div>
+            <div id="playlistList"></div>
+        </div>
+    </div>
 
     <div id="toast">Kopyalandı! @tasd.emir25</div>
 
@@ -403,7 +518,7 @@
 
         <!-- SORULAR -->
         <div id="screen-q1" class="screen hidden">
-            <h1>Soru 1 / 7</h1>
+            <h1>Soru 1 / 6</h1>
             <label>Seninle ilk nerede tanıştık?</label>
             <input type="text" id="ans-1" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-1" class="error-msg"></div>
@@ -411,7 +526,7 @@
         </div>
 
         <div id="screen-q2" class="screen hidden">
-            <h1>Soru 2 / 7</h1>
+            <h1>Soru 2 / 6</h1>
             <label>Lisede sınıftaki en yakın arkadaşın (evi yakın olmasına rağmen geç kalmayı başarabilen biri)?</label>
             <input type="text" id="ans-2" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-2" class="error-msg"></div>
@@ -419,7 +534,7 @@
         </div>
 
         <div id="screen-q3" class="screen hidden">
-            <h1>Soru 3 / 7</h1>
+            <h1>Soru 3 / 6</h1>
             <label>Lisede hangi şubedeydin?</label>
             <input type="text" id="ans-3" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-3" class="error-msg"></div>
@@ -427,7 +542,7 @@
         </div>
 
         <div id="screen-q4" class="screen hidden">
-            <h1>Soru 4 / 7</h1>
+            <h1>Soru 4 / 6</h1>
             <label>Saçlarınla uyumlu hırkan vardı rengi neydi?</label>
             <input type="text" id="ans-4" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-4" class="error-msg"></div>
@@ -435,27 +550,19 @@
         </div>
 
         <div id="screen-q5" class="screen hidden">
-            <h1>Soru 5 / 7</h1>
-            <label>Saçlarının rengi neydi?</label>
+            <h1>Soru 5 / 6</h1>
+            <label>Lisede en sevdiğin ders hangisiydi?</label>
             <input type="text" id="ans-5" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-5" class="error-msg"></div>
             <button onclick="checkQ(5)">İlerle</button>
         </div>
 
         <div id="screen-q6" class="screen hidden">
-            <h1>Soru 6 / 7</h1>
-            <label>Lisede en sevdiğin ders hangisiydi?</label>
+            <h1>Soru 6 / 6</h1>
+            <label>Okula genellikle nasıl gidiyordun?</label>
             <input type="text" id="ans-6" placeholder="Cevabını yaz..." autocomplete="off">
             <div id="error-msg-6" class="error-msg"></div>
-            <button onclick="checkQ(6)">İlerle</button>
-        </div>
-
-        <div id="screen-q7" class="screen hidden">
-            <h1>Soru 7 / 7</h1>
-            <label>Okula genellikle nasıl gidiyordun?</label>
-            <input type="text" id="ans-7" placeholder="Cevabını yaz..." autocomplete="off">
-            <div id="error-msg-7" class="error-msg"></div>
-            <button onclick="checkQ(7)">Sistemi Tamamla</button>
+            <button onclick="checkQ(6)">Sistemi Tamamla</button>
         </div>
 
         <!-- FİNAL -->
@@ -463,7 +570,6 @@
             <div class="romantic-text">
                 <p>Uzun zamandır içimde taşıdığım, kelimelere dökmeye cesaret edemediğim bir şey var...</p>
                 <p>Senden çok uzun zamandır hoşlanıyorum. O gün bugündür cesaretimi toplayıp bir türlü söyleyemedim, hep bir adım geride kaldım. Ama geçen bu uzun yıllar boyunca seni her yerde, sanki kalabalığın içinde hep seni arar gibi aradım durdum.</p>
-                <p style="color: #C00000; font-weight: 500; text-shadow: 0 0 8px rgba(192,0,0,0.25);">İyi ki yollarımız kesişmiş, iyi ki varsın.</p>
             </div>
             
             <div id="final-options">
@@ -497,103 +603,18 @@
         let isMuted = false;
         let isPlayingAudio = false;
         let score = 0;
-        const TOTAL_QUESTIONS = 7;
+        const TOTAL_QUESTIONS = 6;
 
-        const screens = ['screen-name','screen-warning','screen-refuse','screen-q1','screen-q2','screen-q3','screen-q4','screen-q5','screen-q6','screen-q7','screen-final'];
+        const screens = ['screen-name','screen-warning','screen-refuse','screen-q1','screen-q2','screen-q3','screen-q4','screen-q5','screen-q6','screen-final'];
 
         function initAudio() {
-            if (isPlayingAudio || isMuted) return;
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-
-                masterGain = audioCtx.createGain();
-                masterGain.gain.value = 0.22;
-
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = 480;
-
-                const delay = audioCtx.createDelay();
-                delay.delayTime.value = 0.55;
-                const feedback = audioCtx.createGain();
-                feedback.gain.value = 0.45;
-
-                delay.connect(feedback);
-                feedback.connect(delay);
-                delay.connect(filter);
-                filter.connect(masterGain);
-                masterGain.connect(audioCtx.destination);
-
-                isPlayingAudio = true;
-                startAmbientMusic(filter);
-            } catch (e) { console.log("Ses başlatılamadı"); }
-        }
-
-        function playSoftNote(freq, duration, volume, dest) {
-            if (!audioCtx || isMuted) return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, now);
-            gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.linearRampToValueAtTime(volume, now + 1.1);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-            osc.connect(gain);
-            gain.connect(dest);
-            osc.start(now);
-            osc.stop(now + duration);
-        }
-
-        function startAmbientMusic(filterNode) {
-            const progressions = [
-                { bass: 110, notes: [220, 261.63, 329.63, 392] },
-                { bass: 87.31, notes: [174.61, 220, 261.63, 329.63] },
-                { bass: 130.81, notes: [261.63, 329.63, 392, 493.88] },
-                { bass: 98, notes: [196, 246.94, 293.66, 329.63] }
-            ];
-            let chordIdx = 0;
-            let noteIdx = 0;
-
-            function triggerChord() {
-                if (!audioCtx || isMuted) return;
-                const c = progressions[chordIdx];
-                playSoftNote(c.bass, 6, 0.1, filterNode);
-                playSoftNote(c.notes[0], 5.5, 0.06, filterNode);
-                playSoftNote(c.notes[1], 5.5, 0.05, filterNode);
-                chordIdx = (chordIdx + 1) % progressions.length;
-            }
-            triggerChord();
-            setInterval(triggerChord, 5400);
-
-            setInterval(() => {
-                if (!audioCtx || isMuted) return;
-                const active = progressions[(chordIdx + progressions.length - 1) % progressions.length];
-                playSoftNote(active.notes[noteIdx % active.notes.length], 3.2, 0.045, filterNode);
-                noteIdx++;
-            }, 1100);
+            // Ambient müzik kaldırıldı, sadece YouTube çalıyor
+            return;
         }
 
         function playSuccessSound() {
-            if (!audioCtx || isMuted) return;
-            try {
-                const now = audioCtx.currentTime;
-                // Bright ascending chime
-                [523.25, 659.25, 783.99].forEach((freq, i) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now);
-                    gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now + i * 0.06);
-                    osc.stop(now + 0.4);
-                });
-            } catch(e) {}
+            // İsteğe bağlı, şimdilik kapalı
+            return;
         }
 
         function playConfettiSound() {
@@ -748,9 +769,8 @@
             2: ['busra'],
             3: ['a'],
             4: ['kirmizi'],
-            5: ['siyah', 'kahverengi', 'sari', 'sarisin', 'kumral', 'kizil', 'kirmizi', 'beyaz', 'gri', 'platin', 'mor', 'mavi', 'yesil', 'pembe', 'turuncu', 'altin', 'bakir'],
-            6: ['matematik', 'edebiyat', 'ingilizce', 'tarih', 'cografya', 'fizik', 'kimya', 'biyoloji', 'felsefe', 'din', 'muzik', 'resim', 'beden', 'bilisim', 'almanca', 'fransizca', 'turkce', 'geometri', 'sosyal'],
-            7: ['yuruyerek', 'otobus', 'servis', 'yürüyerek', 'araba', 'arabayla', 'taksi', 'dolmus', 'bisiklet']
+            5: ['matematik', 'edebiyat', 'ingilizce', 'tarih', 'cografya', 'fizik', 'kimya', 'biyoloji', 'felsefe', 'din', 'muzik', 'resim', 'beden', 'bilisim', 'almanca', 'fransizca', 'turkce', 'geometri', 'sosyal'],
+            6: ['yuruyerek', 'otobus', 'servis', 'yürüyerek', 'araba', 'arabayla', 'taksi', 'dolmus', 'bisiklet']
         };
 
         function checkQ(qNum) {
@@ -832,6 +852,77 @@
         });
 
         document.getElementById('ans-name').focus();
+
+        // ===== PLAYLIST (YouTube only) =====
+        const playlist = [
+            { title: "Selin - SEVEMEZSİN", id: "vt1OP42Em6o" },
+            { title: "Semicenk - Sen Kaldın", id: "QPXU_mvj2dg" },
+            { title: "Semicenk - Düşer Aklıma", id: "MJOw24mP4X8" },
+            { title: "Semicenk - Onlar Anlamaz Halden", id: "riwF4OyxKys" },
+            { title: "Semicenk - Geçiyor Zaman", id: "2ROyiaxw73c" },
+            { title: "Semicenk - Çıkmaz Bir Sokakta", id: "cLygvXtuklI" },
+            { title: "Selin - Yalancı Bahar", id: "fYANUUFozvI" },
+            { title: "Selin - ŞIP", id: "5kpdJg11duo" },
+            { title: "Mabel Matiz - Gel", id: "ME1WaoCudmw" },
+            { title: "Semicenk - Tek Başıma", id: "Oa-R0LvqTpE" },
+            { title: "Semicenk - Herkes Gibisin", id: "GfTBpCuu6yI" },
+            { title: "Selin & Mabel - Yanılır Gibi", id: "DdfQ1P926VQ" },
+            { title: "Ambient Calm", id: "jfKfPfyJRdk" },
+            { title: "Soft Ambient", id: "lTRiuFIWV54" },
+            { title: "Night Ambient", id: "5qap5aO4i9A" }
+        ];
+
+        let currentIndex = -1;
+
+        function togglePlaylist() {
+            document.getElementById('playlistOverlay').classList.toggle('show');
+            renderPlaylist();
+        }
+
+        function renderPlaylist() {
+            const list = document.getElementById('playlistList');
+            list.innerHTML = '';
+            playlist.forEach((song, i) => {
+                const div = document.createElement('div');
+                div.className = 'playlist-item' + (currentIndex === i ? ' active' : '');
+                div.textContent = song.title;
+                div.onclick = () => playSong(i);
+                list.appendChild(div);
+            });
+        }
+
+        function playSong(index) {
+            currentIndex = index;
+            const song = playlist[index];
+            document.getElementById('currentSong').textContent = song.title;
+            document.getElementById('musicBtnText').textContent = song.title.split(' - ')[0] || song.title;
+
+            const playerDiv = document.getElementById('ytPlayer');
+            playerDiv.innerHTML = '';
+
+            const iframe = document.createElement('iframe');
+            iframe.width = '100%';
+            iframe.height = '200';
+            // origin parametresi ekle (hata 153'ü çözer çoğu zaman)
+            const origin = encodeURIComponent(window.location.origin || 'https://localhost');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${song.id}?autoplay=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${origin}`;
+            iframe.frameBorder = '0';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+            iframe.allowFullscreen = true;
+            playerDiv.appendChild(iframe);
+
+            // Hata olursa diye yedek link
+            const fallback = document.createElement('a');
+            fallback.href = `https://www.youtube.com/watch?v=${song.id}`;
+            fallback.target = '_blank';
+            fallback.textContent = 'YouTube’da Aç';
+            fallback.style.cssText = 'display:block; margin-top:8px; color:#C00000; font-size:0.85rem; text-decoration:none;';
+            playerDiv.appendChild(fallback);
+
+            renderPlaylist();
+        }
+
+        renderPlaylist();
     </script>
 </body>
 </html>
