@@ -147,27 +147,57 @@
 
         .music-btn {
             position: absolute;
-            top: 18px;
-            right: 70px;
-            background: rgba(30,30,30,0.85);
+            top: 16px;
+            right: 68px;
+            background: rgba(30,30,30,0.9);
             border: 1px solid #333;
             padding: 0 12px;
-            height: 44px;
-            border-radius: 22px;
+            height: 42px;
+            border-radius: 21px;
             cursor: pointer;
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.3s;
             backdrop-filter: blur(8px);
-            font-size: 0.8rem;
-            color: #aaa;
-            max-width: 160px;
+            font-size: 0.78rem;
+            color: #ccc;
+            max-width: none;
+            width: auto;
+            white-space: nowrap;
         }
         .music-btn:hover { background: #222; border-color: #555; color: #fff; }
-        .music-btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
-        .music-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .music-btn svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+        .music-btn span {
+            white-space: nowrap;
+            display: inline-block;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .playlist-header h3 { font-size: 1.05rem; font-weight: 500; margin: 0; }
+        .close-playlist {
+            background: none !important;
+            border: none !important;
+            color: #aaa !important;
+            font-size: 1.8rem !important;
+            cursor: pointer;
+            padding: 0 4px !important;
+            line-height: 1 !important;
+            width: auto !important;
+            height: auto !important;
+            border-radius: 0 !important;
+        }
+        .close-playlist:hover { color: #fff !important; background: none !important; }
 
         .playlist-overlay {
             position: fixed;
@@ -237,7 +267,7 @@
         .playlist-item:hover, .playlist-item.active { background: rgba(192,0,0,0.15); color: #fff; }
 
         @media (max-width: 480px) {
-            .music-btn { right: 60px; max-width: 120px; font-size: 0.75rem; padding: 0 8px; }
+            .music-btn { right: 58px; font-size: 0.75rem; }
             .mute-btn { right: 10px; }
         }
 
@@ -668,7 +698,10 @@
             } else {
                 icon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
             }
-            if (masterGain) masterGain.gain.value = isMuted ? 0 : 0.22;
+            // YouTube player'ı mute et
+            if (currentIndex >= 0) {
+                playSong(currentIndex); // yeniden yükle mute parametresiyle
+            }
         }
 
         function cleanText(text) {
@@ -867,9 +900,16 @@
             { title: "Semicenk - Tek Başıma", id: "Oa-R0LvqTpE" },
             { title: "Semicenk - Herkes Gibisin", id: "GfTBpCuu6yI" },
             { title: "Selin & Mabel - Yanılır Gibi", id: "DdfQ1P926VQ" },
-            { title: "Ambient Calm", id: "jfKfPfyJRdk" },
-            { title: "Soft Ambient", id: "lTRiuFIWV54" },
-            { title: "Night Ambient", id: "5qap5aO4i9A" }
+            { title: "Semicenk - Canın Sağ Olsun", id: "KDV_-rXGy7A" },
+            { title: "Semicenk - Gözlerinden Gözlerine", id: "L3LSKvtxvZQ" },
+            { title: "Selin - Bir Özür", id: "8LBmoqGOeZU" },
+            { title: "Mabel Matiz - A Canım", id: "nzB15DkJ8v4" },
+            { title: "Ambient Calm Waves", id: "jfKfPfyJRdk" },
+            { title: "Soft Night Ambient", id: "lTRiuFIWV54" },
+            { title: "Deep Ambient", id: "5qap5aO4i9A" },
+            { title: "Chill Instrumental Mix", id: "4xDzrJKXOOY" },
+            { title: "Emotional Piano", id: "1ZYbU82GVz4" },
+            { title: "Night Drive", id: "mPZkdNFkNps" }
         ];
 
         let currentIndex = -1;
@@ -895,7 +935,8 @@
             currentIndex = index;
             const song = playlist[index];
             document.getElementById('currentSong').textContent = song.title;
-            document.getElementById('musicBtnText').textContent = song.title.split(' - ')[0] || song.title;
+            const textEl = document.getElementById('musicBtnText');
+            textEl.textContent = song.title;
 
             const playerDiv = document.getElementById('ytPlayer');
             playerDiv.innerHTML = '';
@@ -905,7 +946,8 @@
             iframe.height = '200';
             // origin parametresi ekle (hata 153'ü çözer çoğu zaman)
             const origin = encodeURIComponent(window.location.origin || 'https://localhost');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${song.id}?autoplay=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${origin}`;
+            const muteParam = isMuted ? '&mute=1' : '&mute=0';
+            iframe.src = `https://www.youtube-nocookie.com/embed/${song.id}?autoplay=1${muteParam}&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${origin}&start=0`;
             iframe.frameBorder = '0';
             iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
             iframe.allowFullscreen = true;
